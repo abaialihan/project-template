@@ -1,0 +1,90 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.springframework.boot' version '3.5.0-SNAPSHOT'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
+}
+
+group = 'io.reviro'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+allprojects {
+    group = 'io.reviro'
+    version = '1.0.0'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/snapshot' }
+    }
+
+    dependencies {
+
+        //implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+    }
+
+    ext {
+        set('springCloudVersion', "2025.0.0-M1")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    kotlin {
+        compilerOptions {
+            freeCompilerArgs.addAll '-Xjsr305=strict'
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}
+
+allOpen {
+    annotation 'jakarta.persistence.Entity'
+    annotation 'jakarta.persistence.MappedSuperclass'
+    annotation 'jakarta.persistence.Embeddable'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled=false
+}
